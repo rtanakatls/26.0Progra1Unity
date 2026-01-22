@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Enemy2 : MonoBehaviour, IObserver
 {
-
+    
     private void Start()
     {
         GameController.Instance.Attach(this);
