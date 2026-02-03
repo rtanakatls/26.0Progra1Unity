@@ -158,7 +158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 727320457
+  GlobalObjectIdHash: 2780034147
   InScenePlacedSourceGlobalObjectIdHash: 2780034147
   DeferredDespawnTick: 0
   Ownership: 1
@@ -247,5 +247,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   ShowTopMostFoldoutHeaderGroup: 1
-  moveInput: {fileID: 0}
+  ownerMaterial: {fileID: 2100000, guid: 652ecdc1ca7f5734a9b5a4e7d307f59a, type: 2}
+  otherMaterial: {fileID: 2100000, guid: e868aaf1130e1774290fc3965b22b834, type: 2}
   speed: 10
