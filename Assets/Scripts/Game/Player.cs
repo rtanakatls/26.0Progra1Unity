@@ -1,9 +1,14 @@
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
+using TMPro;
+using Unity.Collections;
 
 public class Player : NetworkBehaviour
 {
+
+    private NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>();
+    [SerializeField] private TextMeshPro nameText;
     [SerializeField] private Material ownerMaterial;
     [SerializeField] private Material otherMaterial;
     private InputSystem_Actions input;
@@ -16,6 +21,38 @@ public class Player : NetworkBehaviour
         rb=GetComponent<Rigidbody>();
         input = new InputSystem_Actions();
         moveAction = input.Player.Move;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        nameText.text= playerName.Value.ToString();
+        playerName.OnValueChanged += (oldName, newName) =>
+        {
+            nameText.text = newName.ToString();
+        };
+    }
+
+    public void SetName(string name)
+    {
+        if (!IsOwner)
+        {
+            return;
+        }
+        SendNameToServerRpc(name);
+
+    }
+
+    [Rpc(SendTo.Server)]
+    private void SendNameToServerRpc(string name)
+    {
+        playerName.Value = name;
+        SendNameToClientsRpc(name);
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void SendNameToClientsRpc(string name)
+    {
+        nameText.text = name;   
     }
 
     private void Start()
