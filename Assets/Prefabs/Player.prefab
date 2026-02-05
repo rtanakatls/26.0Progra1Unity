@@ -433,3 +433,4 @@ MonoBehaviour:
   ownerMaterial: {fileID: 2100000, guid: 652ecdc1ca7f5734a9b5a4e7d307f59a, type: 2}
   otherMaterial: {fileID: 2100000, guid: e868aaf1130e1774290fc3965b22b834, type: 2}
   speed: 10
+  bulletPrefab: {fileID: 518371706327343423, guid: 9c8f858428eee9b49800e81bab55fb63, type: 3}
