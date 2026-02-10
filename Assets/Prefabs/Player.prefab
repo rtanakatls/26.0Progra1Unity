@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4000177974356530392}
   - component: {fileID: 2963972645128051908}
   - component: {fileID: 1161772498216033569}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -198,7 +198,7 @@ GameObject:
   - component: {fileID: 7487205844990694601}
   - component: {fileID: 1822279135196196759}
   - component: {fileID: 3348110499241322905}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -311,7 +311,7 @@ Rigidbody:
   serializedVersion: 5
   m_Mass: 1
   m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_AngularDamping: 10
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -434,3 +434,6 @@ MonoBehaviour:
   otherMaterial: {fileID: 2100000, guid: e868aaf1130e1774290fc3965b22b834, type: 2}
   speed: 10
   bulletPrefab: {fileID: 518371706327343423, guid: 9c8f858428eee9b49800e81bab55fb63, type: 3}
+  layers:
+    serializedVersion: 2
+    m_Bits: 8

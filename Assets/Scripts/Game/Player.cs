@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 using TMPro;
 using Unity.Collections;
 using Unity.Cinemachine;
+using System.Collections;
+using System.Runtime.CompilerServices;
 
 public class Player : NetworkBehaviour
 {
@@ -22,7 +24,9 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject bulletPrefab;
     private Vector3 direction;
 
+    [SerializeField] private LayerMask layers;
 
+    private bool isPushed;
     private void Awake()
     {
         rb=GetComponent<Rigidbody>();
@@ -61,6 +65,46 @@ public class Player : NetworkBehaviour
     private void SendNameToClientsRpc(string name)
     {
         nameText.text = name;   
+    }
+    [Rpc(SendTo.Server)]
+    private void SendPushToServerRpc(Vector3 originPosition, Vector3 overlapPosition)
+    {
+        if(!IsServer)
+        {
+            return;
+        }
+        Collider[] hitColliders = Physics.OverlapSphere(overlapPosition, 0.5f,layers);
+        foreach(Collider collider in hitColliders)
+        {
+            if (collider.GetComponent<Player>())
+            {   
+                Player player = collider.GetComponent<Player>();
+                if (player != this)
+                {
+                    Vector3 pushDirection = (player.transform.position - originPosition).normalized;
+                    player.SendPushToClientsRpc(pushDirection);
+                }
+            }
+        }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void SendPushToClientsRpc(Vector3 pushDirection)
+    {
+        if (!IsOwner)
+        {
+            return;
+        }
+        rb.linearVelocity = Vector3.zero;
+        rb.AddForce(pushDirection * 10f, ForceMode.Impulse);
+        StartCoroutine(Push());
+    }
+
+    private IEnumerator Push()
+    {
+        isPushed = true;
+        yield return new WaitForSeconds(0.5f);
+        isPushed = false;
     }
 
     private void Start()
@@ -101,6 +145,10 @@ public class Player : NetworkBehaviour
             return;
         }
 
+        if(isPushed)
+        {
+            return;
+        }
         Vector2 moveInput= moveAction.ReadValue<Vector2>();
         Vector3 direction=new Vector3(moveInput.x,0,moveInput.y);
 
@@ -115,6 +163,17 @@ public class Player : NetworkBehaviour
         }
         Vector3 velocity= direction * speed+new Vector3(0,rb.linearVelocity.y,0);
         rb.linearVelocity=velocity;
+
+        if(attackAction.WasPerformedThisFrame())
+        {
+            SendPushToServerRpc(transform.position, transform.position + direction);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color=Color.red;
+        Gizmos.DrawWireSphere(transform.position + direction, 0.5f);
     }
 
     [Rpc(SendTo.Server)]
