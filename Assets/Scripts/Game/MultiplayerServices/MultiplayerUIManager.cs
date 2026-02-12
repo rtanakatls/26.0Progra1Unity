@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Services.Multiplayer;
@@ -26,38 +27,65 @@ public class MultiplayerUIManager : MonoBehaviour
 
     private async void Host()
     {
-        await MultiplayerServiceManager.Instance.CreateSessionAsync();
-        Destroy(canvas);
+        try
+        {
+            LoadingScreen.Instance.Show();
+            await MultiplayerServiceManager.Instance.CreateSessionAsync();
+            Destroy(canvas);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
+        LoadingScreen.Instance.Hide();
     }
 
     private async void Refresh()
     {
-        foreach(Transform t in joinButtonContainer.GetComponentInChildren<Transform>())
+        try
         {
-            if (t != joinButtonContainer.transform)
+            LoadingScreen.Instance.Show();
+            foreach (Transform t in joinButtonContainer.GetComponentInChildren<Transform>())
             {
-                Destroy(t.gameObject);
+                if (t != joinButtonContainer.transform)
+                {
+                    Destroy(t.gameObject);
+                }
+            }
+
+            IList<ISessionInfo> sessions = await MultiplayerServiceManager.Instance.GetSessionAsync();
+
+            if (sessions.Count > 0)
+            {
+                foreach (ISessionInfo session in sessions)
+                {
+                    GameObject obj = Instantiate(joinButtonPrefab, joinButtonContainer.transform);
+                    obj.GetComponentInChildren<TextMeshProUGUI>().text = $"Join {session.Id} - {session.AvailableSlots}/{session.MaxPlayers}";
+                    obj.GetComponent<Button>().onClick.AddListener(() => Join(session.Id));
+                }
             }
         }
-
-        IList<ISessionInfo> sessions= await MultiplayerServiceManager.Instance.GetSessionAsync();
-
-        if(sessions.Count>0)
+        catch (Exception e)
         {
-            foreach (ISessionInfo session in sessions)
-            {
-                GameObject obj = Instantiate(joinButtonPrefab, joinButtonContainer.transform);
-                obj.GetComponentInChildren<TextMeshProUGUI>().text = $"Join {session.Id} - {session.AvailableSlots}/{session.MaxPlayers}";
-                obj.GetComponent<Button>().onClick.AddListener(() => Join(session.Id));
-            }
+            Debug.LogError(e.Message);
         }
 
-
+        LoadingScreen.Instance.Hide();
     }
 
     public async void Join(string sessionId)
     {
-        await MultiplayerServiceManager.Instance.JoinSessionByIdAsync(sessionId);
-        Destroy(canvas);
+        try
+        {
+            LoadingScreen.Instance.Show();
+            await MultiplayerServiceManager.Instance.JoinSessionByIdAsync(sessionId);
+            Destroy(canvas);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
+
+        LoadingScreen.Instance.Hide();
     }
 }
