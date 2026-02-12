@@ -12,6 +12,8 @@ public class MultiplayerServiceManager : MonoBehaviour
 
     public static MultiplayerServiceManager Instance { get  { return instance; } }
 
+    private ISession currentSession;
+
     private void Awake()
     {
         instance = this;
@@ -30,6 +32,8 @@ public class MultiplayerServiceManager : MonoBehaviour
             MaxPlayers = 4
         }.WithRelayNetwork();
         IHostSession session = await MultiplayerService.Instance.CreateSessionAsync(options);
+        
+        currentSession = session;
         return session;
     }
 
@@ -42,8 +46,20 @@ public class MultiplayerServiceManager : MonoBehaviour
 
     public async Task JoinSessionByIdAsync(string sessionId)
     {
-        await MultiplayerService.Instance.JoinSessionByIdAsync(sessionId);
+        currentSession = await MultiplayerService.Instance.JoinSessionByIdAsync(sessionId);
+
     }
+
+    public async Task LeaveSessionAsync()
+    {
+        if (currentSession != null)
+        {
+            await currentSession.LeaveAsync();
+            currentSession = null;
+        }
+    }
+
+
 
 
 }
